@@ -3,159 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expense &amp; Budget Visualizer</title>
+  <title>Expense & Budget Visualizer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <div class="app-wrapper">
 
     <!-- Header -->
-    <header class="app-header">
-      <div class="header-left">
-        <h1>💸 Budget Visualizer</h1>
-        <p>Track spending. Stay on top.</p>
-      </div>
-      <div class="header-actions">
-        <button class="btn-icon" id="themeToggle" title="Toggle dark/light mode">🌙</button>
-      </div>
-    </header>
+    <div class="app-header">
+      <h1 class="app-title">Expense &amp; Budget Visualizer</h1>
+      <button class="btn-theme" id="themeToggle" title="Toggle dark/light mode">🌙</button>
+    </div>
 
     <!-- Balance Card -->
     <div class="balance-card">
-      <div class="balance-label">Total Balance</div>
+      <div class="balance-label">TOTAL BALANCE</div>
       <div class="balance-amount" id="balanceAmount">$0.00</div>
-      <div class="balance-meta">
-        <div class="balance-stat">
-          <span>Income</span>
-          <span class="income-val" id="incomeTotal">+$0.00</span>
-        </div>
-        <div class="balance-stat">
-          <span>Expenses</span>
-          <span class="expense-val" id="expenseTotal">$0.00</span>
-        </div>
-      </div>
     </div>
 
     <!-- Add Transaction Form -->
-    <div class="card" style="margin-bottom:20px;">
-      <div class="card-header">
-        <span class="card-title">Add Transaction</span>
+    <div class="card">
+      <div class="card-title">Add Transaction</div>
+
+      <div class="field">
+        <label for="itemName">Item Name</label>
+        <input type="text" id="itemName" placeholder="e.g. Lunch, Uber, Netflix…" autocomplete="off" />
       </div>
-      <div class="card-body">
-        <div class="form-grid">
 
-          <!-- Type toggle -->
-          <div class="type-toggle">
-            <button id="btnIncome">＋ Income</button>
-            <button id="btnExpense">－ Expense</button>
-          </div>
+      <div class="field">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" />
+      </div>
 
-          <!-- Name -->
-          <div class="field">
-            <label for="itemName">Item Name</label>
-            <input type="text" id="itemName" placeholder="e.g. Lunch, Uber, Netflix…" autocomplete="off" />
-          </div>
+      <div class="field">
+        <label for="catSelect">Category</label>
+        <select id="catSelect"></select>
+      </div>
 
-          <!-- Amount + Category -->
-          <div class="form-row">
-            <div class="field">
-              <label for="amount">Amount ($)</label>
-              <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" />
-            </div>
-            <div class="field">
-              <label for="catSelect">Category</label>
-              <div class="select-wrapper">
-                <select id="catSelect"></select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Spending limit row -->
-          <div class="limit-row">
-            <input type="checkbox" id="limitEnabled" />
-            <label for="limitEnabled">Highlight over limit</label>
-            <div class="limit-input-wrap" id="limitInputWrap" style="display:none;">
-              <span>Limit $</span>
-              <input type="number" class="limit-field" id="limitField" placeholder="500" min="1" />
-            </div>
-          </div>
-
-          <!-- Error -->
-          <div class="form-error" id="formError"></div>
-
-          <!-- Submit -->
-          <button class="btn-primary" id="addBtn">Add Transaction</button>
+      <!-- Spending Limit -->
+      <div class="limit-row">
+        <input type="checkbox" id="limitEnabled" />
+        <label for="limitEnabled">Highlight over limit</label>
+        <div class="limit-input-wrap" id="limitInputWrap">
+          <span>Limit $</span>
+          <input type="number" id="limitField" class="limit-field" placeholder="e.g. 100" min="1" />
         </div>
       </div>
+
+      <div class="form-error" id="formError"></div>
+      <button class="btn-primary" id="addBtn">Add Transaction</button>
     </div>
 
-    <!-- Bottom grid: Transaction list + Chart -->
+    <!-- Bottom grid: Transactions + Chart -->
     <div class="bottom-grid">
 
-      <!-- Transactions -->
+      <!-- Transaction List -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Transactions</span>
-          <select class="sort-select" id="sortSelect">
-            <option value="date">Latest first</option>
-            <option value="amount-desc">Amount ↓</option>
-            <option value="amount-asc">Amount ↑</option>
-            <option value="cat">Category A–Z</option>
-          </select>
-        </div>
-        <div class="card-body">
-          <div class="limit-banner" id="limitBanner"></div>
-          <div class="transaction-list" id="txList"></div>
-        </div>
+        <div class="card-title">Transactions</div>
+        <div class="limit-banner" id="limitBanner"></div>
+        <div class="transaction-list" id="txList"></div>
       </div>
 
       <!-- Chart -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Spending by Category</span>
+        <div class="card-title">Spending by Category</div>
+        <div class="chart-wrapper">
+          <canvas id="spendChart"></canvas>
         </div>
-        <div class="card-body">
-          <div class="chart-wrapper">
-            <canvas id="spendChart"></canvas>
-          </div>
-          <div class="chart-legend" id="chartLegend"></div>
-        </div>
+        <div class="chart-legend" id="chartLegend"></div>
       </div>
+
     </div>
 
-    <!-- Monthly Summary -->
-    <div class="card summary-section">
-      <div class="card-header">
-        <span class="card-title">📅 Monthly Summary</span>
-      </div>
-      <div class="card-body">
-        <div id="monthlySummary"></div>
-      </div>
-    </div>
+  </div>
 
-    <!-- Custom Categories -->
-    <div class="card" style="margin-top:20px;">
-      <div class="card-header">
-        <span class="card-title">🏷️ Custom Categories</span>
-      </div>
-      <div class="card-body">
-        <div class="cat-tags" id="catTagsWrap"></div>
-        <div class="section-sep"></div>
-        <div class="add-cat-row">
-          <input type="text" id="newCatInput" placeholder="New category name…" maxlength="24" />
-          <button id="addCatBtn">Add</button>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /app-wrapper -->
-
-  <!-- Chart.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <!-- App -->
-  <script src="js/app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
